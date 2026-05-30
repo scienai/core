@@ -1286,24 +1286,18 @@ func (tf *MathpadTextField) hasWordWrap() bool {
 // in the overall RenderAll of all the text.
 // These positions can be out of visible range: see CharRenderPos
 func (tf *MathpadTextField) charPos(idx int) math32.Vector2 {
-	fmt.Println("charPos tf.editText", tf.editText)
 	if idx <= 0 {
 		return math32.Vector2{}
 	}
 	tf.configTextSize(tf.Geom.Size.Actual.Content)
-	fmt.Println("1charPos", "idx", idx, "tf.editText", tf.editText)
 	bb := tf.renderAll.RuneBounds(idx)
-	fmt.Println("2charPos", "idx", idx, "tf.editText", tf.editText)
 	if idx >= len(tf.editText) {
 		if tf.numLines > 1 && tf.editText[len(tf.editText)-1] == ' ' {
-			fmt.Println("3charPos", "idx", idx, "tf.editText", tf.editText)
 			bb.Max.X += tf.lineHeight * 0.2
 			return bb.Max
 		}
-		fmt.Println("4charPos", "idx", idx, "tf.editText", tf.editText)
 		return bb.Max
 	}
-	fmt.Println("5charPos", "idx", idx, "tf.editText", tf.editText, "bb.Min", bb.Min)
 	return bb.Min
 }
 
@@ -1321,7 +1315,6 @@ func (tf *MathpadTextField) charRenderPos(charidx int) math32.Vector2 {
 	sc := tf.Scene
 	pos = pos.Add(math32.FromPoint(sc.SceneGeom.Pos))
 	cpos := tf.relCharPos(0, charidx)
-	fmt.Println("charRenderPos", "pos", pos, "tf.dispRange.Start", tf.dispRange.Start, "charidx", charidx, "cpos", cpos)
 	return math32.Vector2{pos.X + cpos.X, pos.Y}
 }
 
@@ -1354,7 +1347,6 @@ func (tf *MathpadTextField) toggleCursor(on bool) {
 	TextCursor(on, tf.AsWidget(), &MathpadTextFieldCursor, MathpadTextFieldSpriteName, tf.CursorWidth.Dots, tf.lineHeight, tf.CursorColor, func() image.Point {
 		pos := tf.charRenderPos(tf.cursorPos)
 		cursorpos := pos.ToPointFloor()
-		fmt.Println("toggle tf.cursorPos", tf.cursorPos, "cursorpos", cursorpos, "pos", pos)
 		return cursorpos
 	})
 }
@@ -1809,7 +1801,6 @@ func (tf *MathpadTextField) iconsSize() math32.Vector2 {
 }
 
 func (tf *MathpadTextField) SizeUp() {
-	fmt.Println("SizeUp")
 	tf.renderVisible = nil
 	tf.Frame.SizeUp()
 	txt := tf.editText
@@ -1834,7 +1825,6 @@ func (tf *MathpadTextField) SizeUp() {
 }
 
 func (tf *MathpadTextField) SizeDown(iter int) bool {
-	fmt.Println("SizeDown")
 	sz := &tf.Geom.Size
 	prevContent := sz.Actual.Content
 	sz.setInitContentMin(tf.Styles.Min.Dots().Ceil())

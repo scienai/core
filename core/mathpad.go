@@ -189,7 +189,6 @@ func (mpfr *MathpadFrame) Init() {
 	mpfr.On(events.MouseDown, func(e events.Event) {
 		mpfr.selectInitPos = e.Pos()
 		mpfr.selectInitRow, mpfr.selectInitRowChild = mpfr.pixelToRow(e.Pos())
-		fmt.Println("Mathpad mousedown", e.Pos(), "mpfr.selectInitRow", mpfr.selectInitRow, "mpfr.selectInitRowChild", mpfr.selectInitRowChild)
 	})
 	mpfr.On(events.MouseUp, func(e events.Event) {
 		if e.Pos().Eq(mpfr.selectInitPos) {
@@ -205,7 +204,6 @@ func (mpfr *MathpadFrame) Init() {
 			default:
 				mpfr.CursorPos = e.Pos()
 			}
-			fmt.Println("mpfr.SetFocus()")
 			mpfr.SetFocus()
 		} else {
 			Row, RowChild := mpfr.pixelToRow(e.Pos())
@@ -1087,7 +1085,6 @@ func (mpr *MathpadRow) Init() {
 
 func (mpr *MathpadRow) pixelToWidgetBase(pos image.Point) (child Widget) {
 	mpr.ForWidgetChildren(func(i int, cw Widget, cwb *WidgetBase) bool {
-		fmt.Println("cwb.Geom.totalRect()", cwb.Geom.TotalBBox)
 		if pos.In(cwb.Geom.TotalBBox) {
 			child = cw
 			return tree.Break

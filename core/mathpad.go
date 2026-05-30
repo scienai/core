@@ -103,6 +103,7 @@ func (mp *Mathpad) Init() {
 
 		tree.AddAt(p, "Mathpadframe", func(w *MathpadFrame) {
 			mp.sentsfrm = w
+			w.parent = mp
 			NewMathpadRow(w, nil, "", true)
 		})
 	})
@@ -111,6 +112,7 @@ func (mp *Mathpad) Init() {
 type MathpadFrame struct {
 	Frame
 
+	parent  *Mathpad
 	painter *paint.Painter
 
 	CursorColor image.Image
@@ -513,6 +515,7 @@ func (mpfr *MathpadFrame) Init() {
 		}
 		switch kf {
 		case keymap.Enter:
+			fmt.P("e.Modifiers()", e.Modifiers())
 			switch wid := mpfr.focusChild.(type) {
 			case *MathpadTextField:
 				text := wid.Text()
@@ -555,7 +558,26 @@ func (mpfr *MathpadFrame) Init() {
 		case keymap.FocusNext: // we process tab to make it EditDone as opposed to other ways of losing focus
 			//e.SetHandled()
 		case keymap.Accept: // ctrl+enter
-			//e.SetHandled()
+			e.SetHandled()
+			val, err := mpfr.parent.inter.Eval(mpfr.focusChild.(*MathpadTextField).Text())
+			if err != nil {
+				panic(err)
+			}
+			for childi, child := range mpfr.Children {
+				if child == mpfr.focusRow {
+					if childi+1 < len(mpfr.Children) {
+						if mpfr.Children[childi+1].(*MathpadRow).inrow {
+							NewMathpadRow(mpfr, mpfr.focusRow, fmt.Sprintf("%v", val), false)
+							mpfr.Update()
+						} else {
+							mpfr.Children[childi+1].(*MathpadRow).Children[1].(*MathpadTextField).SetText(fmt.Sprintf("%v", val))
+						}
+					} else {
+						NewMathpadRow(mpfr, mpfr.focusRow, fmt.Sprintf("%v", val), false)
+						mpfr.Update()
+					}
+				}
+			}
 		case keymap.FocusPrev:
 			//e.SetHandled()
 		case keymap.Abort: // esc

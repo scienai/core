@@ -30,7 +30,7 @@ import (
 	"github.com/cogentcore/yaegi/stdlib"
 )
 
-// a Mathematia notepad similar widget.
+// a Mathematica notepad similar widget.
 type Mathpad struct {
 	Frame
 	toolbar  *Frame
@@ -631,6 +631,11 @@ func (mpfr *MathpadFrame) Init() {
 										ed.insertAtCursor(string(child.(*MathpadRow).Children[1].(*MathpadTextField).editText))
 										ed.cursorPos = cur
 										ed.startCursor()
+										if i+1 < len(mpfr.Children) && mpfr.Children[i+1].(*MathpadRow).inrow == false {
+											delta = 1
+										} else {
+											delta = 0
+										}
 										mpfr.Children = append(mpfr.Children[:i], mpfr.Children[i+1+delta:]...)
 										mpfr.Update()
 										mpfr.focusRow = mpfr.Children[i-(1+delta)].(*MathpadRow)

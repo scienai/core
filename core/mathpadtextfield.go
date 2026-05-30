@@ -7,12 +7,10 @@ package core
 import (
 	"fmt"
 	"image"
-	"log/slog"
 	"reflect"
 	"slices"
 	"sync"
 	"time"
-	"unicode"
 
 	"cogentcore.org/core/base/fileinfo/mimedata"
 	"cogentcore.org/core/colors"
@@ -305,7 +303,6 @@ func (tf *MathpadTextField) Init() {
 		}
 		e.SetHandled()
 		tf.selectWord()
-		fmt.Println("5 tf.startCursor()")
 		tf.startCursor()
 	})
 	tf.On(events.TripleClick, func(e events.Event) {
@@ -317,7 +314,6 @@ func (tf *MathpadTextField) Init() {
 		}
 		e.SetHandled()
 		tf.selectAll()
-		fmt.Println("6 tf.startCursor()")
 		tf.startCursor()
 	})
 	// tf.On(events.SlideStart, func(e events.Event) {
@@ -497,16 +493,11 @@ func (tf *MathpadTextField) selectToStartByPos(pos image.Point, curposAtLeft boo
 		tf.cursorPos = endpos
 	}
 	tf.selectRegionUpdate(endpos)
-	fmt.Println("selectToStartByPos", "tf", tf, "endpos", endpos)
 	tf.dispRange.Start = tf.selectRange.Start
-	fmt.Println("selectToStartByPos", "tf", tf, "tf.dispRange.Start", tf.dispRange.Start)
 	tf.dispRange.End = tf.selectRange.End
-	fmt.Println("selectToStartByPos", "tf", tf, "tf.dispRange.End", tf.dispRange.End)
-	fmt.Println("selectToStartByPos", "tf", tf, "tf.cursorPos", tf.cursorPos)
 	tf.updateCursorPosition()
 	//tf.startCursor()
 	tf.NeedsRender()
-	fmt.Println("selectToStartByPos", "tf", tf, "tf.cursorPos", tf.cursorPos)
 	//}
 }
 
@@ -515,16 +506,11 @@ func (tf *MathpadTextField) selectToEndByPos(pos image.Point, curposAtLeft bool)
 	endpos := len(tf.editText)
 	if tf.selectInit != endpos {
 		tf.selectRegionUpdate(endpos)
-		fmt.Println("selectToEndByPos", "tf", tf, "endpos", endpos)
 		tf.dispRange.Start = tf.selectRange.Start
-		fmt.Println("selectToEndByPos", "tf", tf, "tf.dispRange.Start", tf.dispRange.Start)
 		tf.dispRange.End = tf.selectRange.End
-		fmt.Println("selectToEndByPos", "tf", tf, "tf.dispRange.End", tf.dispRange.End)
 		tf.cursorEnd()
-		fmt.Println("selectToEndByPos", "tf", tf, "tf.cursorPos", tf.cursorPos)
 		//tf.startCursor()
 		tf.NeedsRender()
-		fmt.Println("tf.cursorPos", tf.cursorPos)
 	}
 }
 
@@ -538,16 +524,11 @@ func (tf *MathpadTextField) selectMiddle(pos1, pos2 image.Point, curposAtLeft bo
 		tf.cursorPos = rightpos
 	}
 	tf.selectRegionUpdate(rightpos)
-	fmt.Println("selectToStartByPos", "tf", tf, "endpos", rightpos)
 	tf.dispRange.Start = tf.selectRange.Start
-	fmt.Println("selectToStartByPos", "tf", tf, "tf.dispRange.Start", tf.dispRange.Start)
 	tf.dispRange.End = tf.selectRange.End
-	fmt.Println("selectToStartByPos", "tf", tf, "tf.dispRange.End", tf.dispRange.End)
-	fmt.Println("selectToStartByPos", "tf", tf, "tf.cursorPos", tf.cursorPos)
 	tf.updateCursorPosition()
 	//tf.startCursor()
 	tf.NeedsRender()
-	fmt.Println("selectToStartByPos", "tf", tf, "tf.cursorPos", tf.cursorPos)
 }
 
 func (tf *MathpadTextField) setCursorPos(pos int) {
@@ -555,13 +536,10 @@ func (tf *MathpadTextField) setCursorPos(pos int) {
 	tf.cursorPos = pos
 	tf.clearSelected()
 	tf.dispRange.Start = 0
-	fmt.Println("selectToStartByPos", "tf", tf, "tf.dispRange.Start", tf.dispRange.Start)
 	tf.dispRange.End = len(tf.editText)
-	fmt.Println("selectToStartByPos", "tf", tf, "tf.dispRange.End", tf.dispRange.End)
 	tf.updateCursorPosition()
 	//tf.startCursor()
 	tf.NeedsRender()
-	fmt.Println("selectToStartByPos", "tf", tf, "tf.cursorPos", tf.cursorPos)
 }
 
 func (tf *MathpadTextField) selectStartToEnd() {
@@ -570,16 +548,11 @@ func (tf *MathpadTextField) selectStartToEnd() {
 	if endpos != 0 {
 		tf.cursorPos = endpos
 		tf.selectRegionUpdate(endpos)
-		fmt.Println("selectStartToEnd", "tf", tf, "mouseup", endpos)
 		tf.dispRange.Start = tf.selectRange.Start
-		fmt.Println("selectStartToEnd", "tf", tf, "tf.dispRange.Start", tf.dispRange.Start)
 		tf.dispRange.End = tf.selectRange.End
-		fmt.Println("selectStartToEnd", "tf", tf, "tf.dispRange.End", tf.dispRange.End)
-		fmt.Println("selectStartToEnd", "tf", tf, "tf.cursorPos", tf.cursorPos)
 		tf.updateCursorPosition()
 		//tf.startCursor()
 		tf.NeedsRender()
-		fmt.Println("selectStartToEnd", "tf", tf, "tf.cursorPos", tf.cursorPos)
 	}
 }
 
@@ -1109,15 +1082,13 @@ func (tf *MathpadTextField) insertAtCursor(str string) {
 	}
 	rs := []rune(str)
 	rsl := len(rs)
-	nt := append(tf.editText, rs...) // first append to end
-	fmt.Println("insertAtCursor", tf.cursorPos, rsl, str, len(nt), nt)
+	nt := append(tf.editText, rs...)               // first append to end
 	copy(nt[tf.cursorPos+rsl:], nt[tf.cursorPos:]) // move stuff to end
 	copy(nt[tf.cursorPos:], rs)                    // copy into position
 	tf.editText = nt
 	tf.dispRange.End += rsl
 	tf.textEdited()
 	tf.cursorPos += rsl
-	fmt.Println("insertAtCursor tf.cursorPos", tf.cursorPos)
 }
 
 func (tf *MathpadTextField) contextMenu(m *Scene) {
@@ -1365,7 +1336,6 @@ func (tf *MathpadTextField) updateCursorPosition() {
 	defer ms.Sprites.Unlock()
 	if sp, ok := ms.Sprites.SpriteByNameNoLock(MathpadTextFieldSpriteName); ok {
 		pt := tf.charRenderPos(tf.cursorPos).ToPointFloor()
-		fmt.Println("updateCursorPosition", pt)
 		sp.EventBBox.Min = pt
 	}
 }
@@ -1566,203 +1536,6 @@ func (tf *MathpadTextField) setCursorFromPixel(pt image.Point, selMode events.Se
 		tf.selectReset()
 	}
 	tf.NeedsRender()
-}
-
-func (tf *MathpadTextField) handleKeyEvents() {
-	tf.OnKeyChord(func(e events.Event) {
-		kf := keymap.Of(e.KeyChord())
-		if DebugSettings.KeyEventTrace {
-			slog.Info("MathpadTextField KeyInput", "widget", tf, "keyFunction", kf)
-		}
-		if !tf.StateIs(states.Focused) && kf == keymap.Abort {
-			return
-		}
-		fmt.Println("MathpadTextField handleKeyEvents", kf)
-		tf.startCursor()
-
-		// first all the keys that work for both inactive and active
-		switch kf {
-		case keymap.MoveRight:
-			e.SetHandled()
-			tf.shiftSelect(e)
-			tf.cursorForward(1)
-			tf.offerComplete()
-		case keymap.WordRight:
-			e.SetHandled()
-			tf.shiftSelect(e)
-			tf.cursorForwardWord(1)
-			tf.offerComplete()
-		case keymap.MoveLeft:
-			e.SetHandled()
-			tf.shiftSelect(e)
-			tf.cursorBackward(1)
-			tf.offerComplete()
-		case keymap.WordLeft:
-			e.SetHandled()
-			tf.shiftSelect(e)
-			tf.cursorBackwardWord(1)
-			tf.offerComplete()
-		case keymap.MoveDown:
-			if tf.numLines > 1 {
-				e.SetHandled()
-				tf.shiftSelect(e)
-				tf.cursorDown(1)
-			}
-		case keymap.MoveUp:
-			if tf.numLines > 1 {
-				e.SetHandled()
-				tf.shiftSelect(e)
-				tf.cursorUp(1)
-			}
-		case keymap.Home:
-			e.SetHandled()
-			tf.shiftSelect(e)
-			tf.cancelComplete()
-			tf.cursorStart()
-		case keymap.End:
-			e.SetHandled()
-			tf.shiftSelect(e)
-			tf.cancelComplete()
-			tf.cursorEnd()
-		case keymap.SelectMode:
-			e.SetHandled()
-			tf.cancelComplete()
-			tf.selectModeToggle()
-		case keymap.CancelSelect:
-			e.SetHandled()
-			tf.cancelComplete()
-			tf.selectReset()
-		case keymap.SelectAll:
-			e.SetHandled()
-			tf.cancelComplete()
-			tf.selectAll()
-		case keymap.Copy:
-			// e.SetHandled()
-			// tf.cancelComplete()
-			// tf.copy()
-			fmt.Println("keymap.Copy return")
-			e.ClearHandled()
-			return
-		}
-		if tf.IsReadOnly() || e.IsHandled() {
-			return
-		}
-		switch kf {
-		case keymap.Enter:
-		case keymap.FocusNext: // we process tab to make it EditDone as opposed to other ways of losing focus
-			// e.SetHandled()
-			// tf.editText = append(tf.editText, '\t')
-			// tf.dispRange.End += 1
-			// tf.textEdited()
-			//tf.cancelComplete()
-			//tf.editDone()
-			//tf.focusNext()
-		case keymap.Accept: // ctrl+enter
-			e.SetHandled()
-			tf.cancelComplete()
-			tf.editDone()
-		case keymap.FocusPrev:
-			// e.SetHandled()
-			// tf.cancelComplete()
-			// tf.editDone()
-			// tf.focusPrev()
-		case keymap.Abort: // esc
-			e.SetHandled()
-			tf.cancelComplete()
-			tf.revert()
-			// tf.FocusChanged(FocusInactive)
-		case keymap.Backspace:
-			e.SetHandled()
-			backcnt := 1
-			if tf.selectRange.End-tf.selectRange.Start > 0 {
-				backcnt = tf.selectRange.End - tf.selectRange.Start
-				tf.cursorPos = tf.selectRange.Start
-			}
-			fmt.Println("4 tf.startCursor()")
-			tf.startCursor()
-			tf.saveUndo()
-			tf.cursorBackspace(backcnt)
-			tf.offerComplete()
-			tf.Send(events.Input, e)
-		case keymap.Kill:
-			e.SetHandled()
-			tf.cancelComplete()
-			tf.cursorKill()
-			tf.Send(events.Input, e)
-		case keymap.Delete:
-			e.SetHandled()
-			tf.saveUndo()
-			tf.cursorDelete(1)
-			tf.offerComplete()
-			tf.Send(events.Input, e)
-		case keymap.BackspaceWord:
-			e.SetHandled()
-			tf.saveUndo()
-			tf.cursorBackspaceWord(1)
-			tf.offerComplete()
-			tf.Send(events.Input, e)
-		case keymap.DeleteWord:
-			e.SetHandled()
-			tf.saveUndo()
-			tf.cursorDeleteWord(1)
-			tf.offerComplete()
-			tf.Send(events.Input, e)
-		case keymap.Cut:
-			e.SetHandled()
-			tf.saveUndo()
-			tf.cancelComplete()
-			tf.cut()
-			tf.Send(events.Input, e)
-		case keymap.Paste:
-			e.SetHandled()
-			tf.saveUndo()
-			tf.cancelComplete()
-			tf.paste()
-			tf.Send(events.Input, e)
-		case keymap.Undo:
-			e.SetHandled()
-			tf.undo()
-		case keymap.Redo:
-			e.SetHandled()
-			tf.redo()
-		case keymap.Complete:
-			e.SetHandled()
-			tf.offerComplete()
-		case keymap.None:
-			if unicode.IsPrint(e.KeyRune()) {
-				if !e.HasAnyModifier(key.Control, key.Meta) {
-					e.SetHandled()
-					tf.saveUndo()
-					tf.insertAtCursor(string(e.KeyRune()))
-					if e.KeyRune() == ' ' {
-						tf.cancelComplete()
-					} else {
-						tf.offerComplete()
-					}
-					tf.Send(events.Input, e)
-				}
-			}
-		}
-	})
-	tf.OnFocus(func(e events.Event) {
-		if tf.IsReadOnly() {
-			e.SetHandled()
-		}
-		// tf.selectInit = tf.pixelToCursor(e.Pos())
-		// tf.selectRange.Start = 0
-		// tf.selectRange.End = 0
-		// tf.selectMode = true
-		// tf.selectModeShift = true
-		// selFocusMathpadTextfields = append(selFocusMathpadTextfields, tf)
-	})
-	tf.OnFocusLost(func(e events.Event) {
-		if tf.IsReadOnly() {
-			e.SetHandled()
-			return
-		}
-		//tf.editDone()
-		tf.stopCursor()
-	})
 }
 
 var selFocusMathpadTextfields []*MathpadTextField

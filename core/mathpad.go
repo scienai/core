@@ -191,10 +191,10 @@ func (mpfr *MathpadFrame) Init() {
 		mpfr.selectInitRow, mpfr.selectInitRowChild = mpfr.pixelToRow(e.Pos())
 	})
 	mpfr.On(events.MouseUp, func(e events.Event) {
+		for _, child := range mpfr.Children {
+			child.(*MathpadRow).Children[1].(*MathpadTextField).clearSelected()
+		}
 		if e.Pos().Eq(mpfr.selectInitPos) {
-			for _, child := range mpfr.Children {
-				child.(*MathpadRow).Children[1].(*MathpadTextField).clearSelected()
-			}
 			mpfr.focusRow = mpfr.selectInitRow
 			mpfr.focusChild = mpfr.selectInitRowChild
 			switch wid := mpfr.focusChild.(type) {

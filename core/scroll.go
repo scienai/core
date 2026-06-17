@@ -5,6 +5,7 @@
 package core
 
 import (
+	"fmt"
 	"image"
 	"time"
 
@@ -382,6 +383,7 @@ func (fr *Frame) scrollToBoxDim(d math32.Dims, tmini, tmaxi int) bool {
 		return false
 	}
 	h := fr.Styles.Font.Size.Dots
+	fmt.P("tmin < cmin", tmin, cmin)
 	if tmin < cmin { // favors scrolling to start
 		trg := sb.Value + tmin - cmin - h
 		if trg < 0 {
@@ -390,6 +392,7 @@ func (fr *Frame) scrollToBoxDim(d math32.Dims, tmini, tmaxi int) bool {
 		sb.setValueEvent(trg)
 		return true
 	}
+	fmt.P("(tmax - tmin) < sb.scrollThumbValue()", tmax, tmin, sb.scrollThumbValue())
 	if (tmax - tmin) < sb.scrollThumbValue() { // only if whole thing fits
 		trg := sb.Value + float32(tmax-cmax) + h
 		sb.setValueEvent(trg)
@@ -403,14 +406,18 @@ func (fr *Frame) scrollToBoxDim(d math32.Dims, tmini, tmaxi int) bool {
 func (fr *Frame) ScrollToBox(box image.Rectangle) bool {
 	did := false
 	if fr.HasScroll[math32.Y] && fr.HasScroll[math32.X] {
+		fmt.P("ScrollToBox", box)
 		did = fr.scrollToBoxDim(math32.Y, box.Min.Y, box.Max.Y)
 		did = did || fr.scrollToBoxDim(math32.X, box.Min.X, box.Max.X)
 	} else if fr.HasScroll[math32.Y] {
+		fmt.P("ScrollToBox", box)
 		did = fr.scrollToBoxDim(math32.Y, box.Min.Y, box.Max.Y)
 	} else if fr.HasScroll[math32.X] {
+		fmt.P("ScrollToBox", box)
 		did = fr.scrollToBoxDim(math32.X, box.Min.X, box.Max.X)
 	}
 	if did {
+		fmt.P("ScrollToBox", box)
 		fr.NeedsRender()
 	}
 	return did
@@ -425,10 +432,12 @@ func (fr *Frame) ScrollDimToStart(d math32.Dims, posi int) bool {
 	}
 	pos := float32(posi)
 	cmin, _ := fr.Geom.contentRangeDim(d)
+	fmt.P("pos == cmin", pos, cmin)
 	if pos == cmin {
 		return false
 	}
 	sb := fr.Scrolls[d]
+	fmt.P("sb.Value+(pos-cmin", sb.Value, pos, cmin)
 	trg := math32.Clamp(sb.Value+(pos-cmin), 0, sb.effectiveMax())
 	sb.setValueEvent(trg)
 	return true
@@ -465,10 +474,12 @@ func (fr *Frame) ScrollDimToEnd(d math32.Dims, posi int) bool {
 	}
 	pos := float32(posi)
 	_, cmax := fr.Geom.contentRangeDim(d)
+	fmt.P("pos == cmax", pos, cmax)
 	if pos == cmax {
 		return false
 	}
 	sb := fr.Scrolls[d]
+	fmt.P("sb.Value+(pos-cmin", sb.Value, pos, cmax)
 	trg := math32.Clamp(sb.Value+(pos-cmax), 0, sb.effectiveMax())
 	sb.setValueEvent(trg)
 	return true
@@ -506,10 +517,12 @@ func (fr *Frame) ScrollDimToCenter(d math32.Dims, posi int) bool {
 	pos := float32(posi)
 	cmin, cmax := fr.Geom.contentRangeDim(d)
 	mid := 0.5 * (cmin + cmax)
+	fmt.P("pos == mid", pos, mid)
 	if pos == mid {
 		return false
 	}
 	sb := fr.Scrolls[d]
+	fmt.P("sb.Value+(pos-mid", sb.Value, pos, mid)
 	trg := math32.Clamp(sb.Value+(pos-mid), 0, sb.effectiveMax())
 	sb.setValueEvent(trg)
 	return true

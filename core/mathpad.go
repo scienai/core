@@ -608,40 +608,75 @@ func (mpfr *MathpadFrame) Init() {
 							backcnt = mpfr.focusChild.(*MathpadTextField).selectRange.End - mpfr.focusChild.(*MathpadTextField).selectRange.Start
 							mpfr.focusChild.(*MathpadTextField).cursorPos = mpfr.focusChild.(*MathpadTextField).selectRange.Start
 						}
+						fmt.P("backcnt", backcnt)
 						mpfr.focusChild.(*MathpadTextField).startCursor()
 						mpfr.focusChild.(*MathpadTextField).saveUndo()
 						mpfr.focusChild.(*MathpadTextField).cursorBackspace(backcnt)
 						mpfr.focusChild.(*MathpadTextField).offerComplete()
 						mpfr.focusChild.(*MathpadTextField).Send(events.Input, e)
 					} else {
+						cheight := 0
 						for i := 0; i < len(mpfr.Children); i += 1 {
 							child := mpfr.Children[i]
 							if child.(*MathpadRow).inrow == false {
 								continue
 							}
+							cheight += child.(*MathpadRow).Geom.contentRect().Dy()
 							if child == mpfr.focusRow {
+								fmt.P("i", i)
 								if i > 0 {
 									delta := 0
 									if mpfr.Children[i-1].(*MathpadRow).inrow == false {
 										delta = 1
 									}
+									fmt.P("delta", delta)
 									if i-(1+delta) >= 0 {
 										ed := mpfr.Children[i-(1+delta)].(*MathpadRow).Children[1].(*MathpadTextField)
 										cur := len(ed.editText)
 										ed.insertAtCursor(string(child.(*MathpadRow).Children[1].(*MathpadTextField).editText))
 										ed.cursorPos = cur
 										ed.startCursor()
+										fmt.P("cur", cur)
 										if i+1 < len(mpfr.Children) && mpfr.Children[i+1].(*MathpadRow).inrow == false {
 											delta = 1
 										} else {
 											delta = 0
 										}
+										fmt.P("delta", delta)
 										mpfr.Children = append(mpfr.Children[:i], mpfr.Children[i+1+delta:]...)
+										if len(mpfr.Children) == 0 {
+											mpfr.Children = mpfr.Children[:1]
+										}
 										mpfr.Update()
+										mpfr.ScrollUpdateFromGeom(math32.Y)
+										mpfr.SetFocus()
 										mpfr.focusRow = mpfr.Children[i-(1+delta)].(*MathpadRow)
 										mpfr.focusChild = ed
+										fmt.Println("cheight<=mpfr.Geom.totalRect().Dy()", cheight, mpfr.Geom.totalRect().Dy())
+										if cheight <= mpfr.Geom.totalRect().Dy() {
+											go func() {
+												time.Sleep(100 * time.Millisecond)
+												mpfr.AsyncLock()
+												mpfr.ScrollDimToContentStart(math32.Y)
+												mpfr.AsyncUnlock()
+											}()
+										} else {
+											go func() {
+												time.Sleep(100 * time.Millisecond)
+												mpfr.AsyncLock()
+												mpfr.scrollToWidget(mpfr.focusRow)
+												mpfr.AsyncUnlock()
+											}()
+										}
 									}
 									break
+								} else {
+									go func() {
+										time.Sleep(100 * time.Millisecond)
+										mpfr.AsyncLock()
+										mpfr.ScrollDimToContentStart(math32.Y)
+										mpfr.AsyncUnlock()
+									}()
 								}
 							}
 						}
@@ -967,7 +1002,7 @@ type MathpadRow struct {
 	Frame
 
 	painter *paint.Painter
-	inrow   bool
+	inrow   bool //is input row true, otherwise false;
 }
 
 var _ = types.AddType(&types.Type{Name: "cogentcore.org/core/core.MathpadRow", IDName: "mathpadrow", Doc: "Mathpad divide widgets into logical groups and give users the ability\nto math execute.", Embeds: []types.Field{{Name: "MathpadFrame"}}, Fields: []types.Field{{Name: "Type", Doc: "Type is the styling type of the tabs. If it is changed after\nthe tabs are first configured, Update needs to be called on\nthe tabs."}}})
